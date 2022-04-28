@@ -1,4 +1,5 @@
-<php? 
+<?php 
+session_start();
 $pageName='index';
 $title='我的首頁';
 ?>
