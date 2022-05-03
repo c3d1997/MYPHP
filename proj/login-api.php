@@ -31,6 +31,20 @@ $sql = "SELECT `id`, `email`, `password`, `nickname` FROM members WHERE `email`=
 $stmt = $pdo->prepare($sql);
 $stmt->execute([$email]);
 
-$output['row'] = $stmt->fetch();
+$row = $stmt->fetch();
+
+if (!empty($row) and password_verify($password, $row['password'])) {
+    $output['success'] = true;
+    $output['code'] = 200;
+    $_SESSION['admin'] = [
+        'id' => $row['id'],
+        'email' => $row['email'],
+        'nickname' => $row['nickname'],
+    ];
+} else {
+    $output['error'] = '帳密錯誤';
+    $output['code'] = 430;
+    $output['row'] = $row;
+}
 
 echo json_encode($output, JSON_UNESCAPED_UNICODE);

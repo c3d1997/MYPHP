@@ -4,12 +4,12 @@ $pageName = 'product-list';
 $title = '產品列表';
 
 $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
-$cate = isset($_GET['cate']) ? intval($_GET['cate']) : 0;//預設為查看所有商品
+$cate = isset($_GET['cate']) ? intval($_GET['cate']) : 0; //預設為查看所有商品
 
 $parmas = [];
 
 $where = 'WHERE 1 ';
-if(!empty($cate)){
+if (!empty($cate)) {
     $where .= " AND category_sid=$cate ";
     $params['cate'] = $cate;
 }
@@ -62,11 +62,11 @@ $cates = $pdo->query($c_sql)->fetchAll();
     <div class="row">
         <div class="col-lg-3">
             <div class="btn-group-vertical" style="width: 100%;">
-                <a class="btn btn-outline-primary" href="?">全部商品</a>
+                <a class="btn <?= empty($cate) ? 'btn-primary' : 'btn-outline-primary' ?>" href="?">全部商品</a>
                 <?php foreach ($cates as $c) : ?>
-                <a class="btn btn-outline-primary" href="?cate=<?= $c['sid']?>"><?=$c['name']?></a>
+                    <a class="btn <?= $cate == $c['sid'] ? 'btn-primary' : 'btn-outline-primary' ?>" href="?cate=<?= $c['sid'] ?>"><?= $c['name'] ?></a>
                 <?php endforeach; ?>
-                </div>
+            </div>
         </div>
         <div class="col-lg-9">
             <div class="row">
@@ -84,9 +84,9 @@ $cates = $pdo->query($c_sql)->fetchAll();
                                 </a>
                             </li>
                             <?php for ($i = $page - 3; $i <= $page + 3; $i++) : ?>
-                                <?php if ($i >= 1 and $i <= $totalPages) : $params['page'] = $i;?>
+                                <?php if ($i >= 1 and $i <= $totalPages) : $params['page'] = $i; ?>
                                     <li class="page-item <?= $page == $i ? 'active' : '' ?>">
-                                        <a class="page-link" href="?<?=http_build_query($params)?>"><?= $i ?></a>
+                                        <a class="page-link" href="?<?= http_build_query($params) ?>"><?= $i ?></a>
                                     </li>
                                 <?php endif; ?>
                             <?php endfor; ?>
@@ -113,6 +113,15 @@ $cates = $pdo->query($c_sql)->fetchAll();
                                 <h5 class="card-title"><?= $r['bookname'] ?></h5>
                                 <p class="card-text"><?= $r['price'] ?></p>
                                 <p class="card-text"><?= $r['author'] ?></p>
+                                <p>
+                                    <select class="form-select form-select-sm" style="display:inline-block; width:auto">
+                                        <?php for ($i = 1; $i <= 5; $i++) : ?>
+                                            <option value="<?= $i ?>"><?= $i ?></option>
+                                        <?php endfor; ?>
+                                    </select>
+
+                                    <button type="button" class="btn btn-primary btn-sm add-to-cart-btn" data-sid ="<?= $r['sid'] ?>" style="display:inline-block"><i class="fa-solid fa-cart-plus"></i></button>
+                                </p>
 
 
 
@@ -125,5 +134,25 @@ $cates = $pdo->query($c_sql)->fetchAll();
 
     </div>
     <?php include __DIR__ . '/parts/scripts.php' ?>
-    <script></script>
+    <script>
+        $('.add-to-cart-btn').on('click',event => {
+            const btn = $(event.currentTarget);
+            const sid = btn.attr('data-sid');
+            //const quantity = btn.prev().val();
+            const quantity = btn.closest('.card').find('select').val();
+
+            console.log({
+                sid,
+                quantity
+            });
+
+            $.get('cart-api.php',{
+                sid,
+                quantity
+            },function(data){
+                console.log(data);
+            },'json');
+            
+        })
+    </script>
     <?php include __DIR__ . '/parts/html-foot.php' ?>

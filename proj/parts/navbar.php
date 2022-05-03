@@ -32,24 +32,27 @@ if (!isset($pageName)) {
                     <li class="nav-item">
                         <a class="nav-link <?= $pageName == 'product-list' ? 'active' : '' ?>" href="product-list.php">商品</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link <?= $pageName == 'cart' ? 'active' : '' ?>" href="cart.php">購物車 <span class="badge bg-danger"></span></a>
+                    </li>
 
                 </ul>
 
                 <ul class="navbar-nav mb-2 mb-lg-0">
                     <?php if (isset($_SESSION['admin'])) : ?>
-                    <li class="nav-item">
-                        <a class="nav-link"><?= $_SESSION['admin']['nickname'] ?></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="logout.php">登出</a>
-                    </li>
+                        <li class="nav-item">
+                            <a class="nav-link"><?= $_SESSION['admin']['nickname'] ?></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="logout.php">登出</a>
+                        </li>
                     <?php else : ?>
-                    <li class="nav-item">
-                    <a class="nav-link <?= $pageName == 'login' ? 'active' : '' ?>" href="login.php">登入</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">註冊</a>
-                    </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= $pageName == 'login' ? 'active' : '' ?>" href="login.php">登入</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">註冊</a>
+                        </li>
                     <?php endif; ?>
                 </ul>
 
@@ -57,3 +60,20 @@ if (!isset($pageName)) {
         </div>
     </nav>
 </div>
+<script>
+    function showCount(data){
+        let total = 0;
+        if(data && data.cart){
+            for(let s in data.cart){
+                total += +data.cart[s];
+            }
+        }
+        document.querySelector('.badge').innerHTML = total;
+    }
+
+    fetch('cart-api.php')
+        .then(r =>r.json())
+        .then(data =>{
+            showCount(data);
+        });
+</script>
